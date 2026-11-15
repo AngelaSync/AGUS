@@ -1,6 +1,9 @@
 #!/bin/sh
 # Container start: listen on Railway's $PORT, wait for MySQL, migrate, seed the demo data, start Apache.
 set -e
+# Apache may only load one MPM; mod_php needs prefork. Some hosts end up with two enabled.
+rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.*
+a2enmod mpm_prefork >/dev/null 2>&1 || true
 PORT="${PORT:-8080}"
 sed -ri "s/Listen 80$/Listen ${PORT}/" /etc/apache2/ports.conf
 sed -ri "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-available/000-default.conf

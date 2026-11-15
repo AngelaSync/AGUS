@@ -1,8 +1,10 @@
 # Runs Replate on Railway (or any Docker host): PHP 8.3 + Apache, MySQL from the environment.
 FROM php:8.3-apache
 
-RUN docker-php-ext-install pdo_mysql \
-    && a2enmod rewrite \
+RUN docker-php-ext-install pdo_mysql
+# mod_php needs the prefork MPM, and Apache refuses to start with more than one MPM enabled.
+RUN rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* \
+    && a2enmod mpm_prefork rewrite \
     && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
     && printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n' > /etc/apache2/conf-available/agus.conf \
     && a2enconf agus
