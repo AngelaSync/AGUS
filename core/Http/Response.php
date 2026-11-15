@@ -43,7 +43,11 @@ class Response
     /** Redirect to a path inside the app ('/login') or a full URL. */
     public static function redirect(string $to, int $status = 302): self
     {
-        $location = preg_match('#^https?://#i', $to) ? $to : url($to);
+        // route() already returns a full link (with the XAMPP folder), so only
+        // plain paths like '/login' get the folder added here.
+        $base = rtrim((string) (config('app.url', '') ?: (request()?->attribute('base_path') ?? '')), '/');
+        $already = preg_match('#^https?://#i', $to) || ($base !== '' && ($to === $base || str_starts_with($to, $base . '/')));
+        $location = $already ? $to : url($to);
         return new self('', $status, ['Location' => $location]);
     }
 
