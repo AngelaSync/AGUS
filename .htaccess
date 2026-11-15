@@ -1,0 +1,13 @@
+# For XAMPP: lets you open http://localhost/agus/ instead of /agus/public/.
+# Every request is passed into the public/ folder, so .env, app/ and storage/
+# can never be downloaded from the browser.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^$ public/ [L]
+    RewriteRule (.*) public/$1 [L]
+</IfModule>
+
+# Fallback if mod_rewrite is off: block direct access to project files.
+<FilesMatch "^\.env|\.(sqlite|log)$">
+    Require all denied
+</FilesMatch>

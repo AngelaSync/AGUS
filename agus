@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+/**
+ * AGUS command-line tool. Run from the project folder:
+ *   php agus            (lists commands)
+ *   php agus serve
+ *   php agus migrate
+ */
+
+declare(strict_types=1);
+
+if (PHP_SAPI !== 'cli') {
+    exit('Run this from the terminal: php agus');
+}
+
+/** @var Agus\App $app */
+$app = require __DIR__ . '/core/bootstrap.php';
+
+exit((new Agus\Console\Console($app))->run($argv));
